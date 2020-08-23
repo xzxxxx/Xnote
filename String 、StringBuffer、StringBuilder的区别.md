@@ -2,7 +2,7 @@
 
 这三个类都是final类不能被继承 , String 实现了Comparable接口，可以进行排序
 
-String 中的byte[ ]数组是被final修饰的，不可以更改，而两个SB则是可以动态扩容的byte[ ],初始byte[]大小默认是16；
+==String 中的byte[ ]数组是被final修饰的==，不可以更改，而两个SB则是可以==动态扩容的byte[ ]==,初始byte[]大小默认是16；
 
 StringBuffer中的方法被synchronized修饰，是线程安全的，而StringBuilder则没有。单线程环境下StringBuilder的效率比StringBuffer的效率高
 
@@ -22,9 +22,11 @@ TreeMap中可以传入Cpmparator 来自定义排序的规则
 
 ## Iterator 和Iterable
 
-![image-20200812162921286](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200812162921286.png)
+![image-20200812162921286](image/String 、StringBuffer、StringBuilder的区别/image-20200812162921286.png)
 
-![image-20200812163038374](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200812163038374.png)
+![image-20200812163038374](image/String 、StringBuffer、StringBuilder的区别/image-20200812163038374.png)
+
+
 
 
 
@@ -114,3 +116,49 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
  Constructor.newInstance();
 ```
 
+
+
+## final关键字和finally 与finalize()
+
+**final** 修饰类时，表示该类无法被继承。   修饰字段时，表示该字段是常量，无法被更改。      修饰方法时，表示该方法不能被重载
+
+**finally** 
+
+```java
+public static String mytry(){
+
+    try {
+        System.out.println("try");
+        return re(); //先执行re()中的方法，再执行finally，最后return
+    }catch (Exception e){
+        System.out.println("catch");
+    }finally {
+        System.out.println("finally");
+    }
+    return " ";
+}
+    public static String re(){
+        System.out.println("re");
+        return "try return";
+    }
+```
+
+==输出顺序== try re finally  tryReturn
+
+**finalize**是Object的一个方法，它的目的是保证对象在被垃圾收集前完成特定资源的回收。
+
+不过finalize已经不推荐使用，JDK9已经标记为过时。
+
+ ## 自动拆箱和装箱
+
+![image-20200822112906499](image/String 、StringBuffer、StringBuilder的区别/image-20200822112906499.png)
+
+```java
+        Integer i1 = 100;
+        Integer i2 = 100;
+        Integer i3 = 200;
+        Integer i4 = 200;
+
+        System.out.println(i1==i2);  //true
+        System.out.println(i3==i4);  //false
+```
