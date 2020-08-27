@@ -39,7 +39,7 @@ a = 1 and b > 2 and c = 3   a,b都用到了索引，c没有用到，因为b进�
 
 索引是为了加快查找速度
 
-![image-20200722140859143](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200722140859143.png)
+![image-20200722140859143](image/Mysql索引/image-20200722140859143.png)
 
 
 
@@ -47,11 +47,11 @@ B+树 一个节点存一页数据，一页数据大小默认16kb
 
 
 
-![image-20200722142427218](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200722142427218.png)
+![image-20200722142427218](image/Mysql索引/image-20200722142427218.png)
 
 
 
-![image-20200722145925713](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200722145925713.png)
+![image-20200722145925713](image/Mysql索引/image-20200722145925713.png)
 
 索引页：存储索引的页
 
@@ -61,15 +61,23 @@ B+树 一个节点存一页数据，一页数据大小默认16kb
 
 #### B+树
 
-B+树只在也叶子节点存储数据，非叶子节点存储索引，叶子节点形成双向链表
+B+树只在叶子节点存储数据，非叶子节点存储索引，叶子节点形成双向链表
 
-B+树是完全平衡树，树的平均高度低
+B+树是完全平衡树，树的平均高度低 
+
+ 
+
+而B树，在非叶子节点也存储数据，一颗B树所使用的内存比B+树要大的多其树的高度也要大
+
+### Innodb创建B+树
+
+利用磁盘预读，一次io最少读取一页数据，如果一行一行的读取数据，io效率十分低
 
 ### 聚集索引（聚簇索引）
 
 **非聚集索引和聚集索引的区别**在于， 通过聚集索引可以查到需要查找的数据， 而通过非聚集索引可以查到记录对应的主键值 ， 再使用主键的值通过聚集索引查找到需要的数据（回表），如下图
 
-![image-20200722145219394](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200722145219394.png)
+![image-20200722145219394](image/Mysql索引/image-20200722145219394.png)
 
 #### 查询
 
@@ -87,7 +95,7 @@ create index i on t( b,c,d)   按照t联合索引进行排序  生成b+树
 
 
 
- ![image-20200722151447271](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200722151447271.png)
+ ![image-20200722151447271](image/Mysql索引/image-20200722151447271.png)
 
 
 
@@ -170,6 +178,7 @@ rows表示MySQL根据表统计信息，以及索引选用的情况，找到所�
 - 支持表级锁
 - 使用非聚簇索引，主键索引文件的数据域存储指向数据文件的指针， 需要经过回表操作
 - 适合读多的场景
+- 保存数据行数
 
 **InnoDB：**
 
@@ -177,6 +186,7 @@ rows表示MySQL根据表统计信息，以及索引选用的情况，找到所�
 - 支持行级锁，间隙锁，外键约束
 - 主键索引采用聚簇索引
 - 适合写多的场景
+- 不保存数据行数，在select count(*) from table 时会造成全表扫描
 
 
 
@@ -232,11 +242,13 @@ ACID
 
 https://www.processon.com/view/link/5eef4a2d6376891e81dc7d28
 
+**两个隐藏列**：1.记录对这条记录改动(增删改操作)的事务ID         2.利用undolog 记录在这条记录改动前的回滚指针
+
 ![image-20200811210937551](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200811210937551.png)
 
 
 
-![image-20200725111900915](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200725111900915.png)
+![image-20200725111900915](image/Mysql索引/image-20200725111900915.png)
 
 ![image-20200725112532451](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200725112532451.png)
 
@@ -244,17 +256,37 @@ https://www.processon.com/view/link/5eef4a2d6376891e81dc7d28
 
 
 
-活跃事务：未提交的事务
+**m_ids**:记录当前活跃事务（未提交事务）的数组
 
-![image-20200813162927944](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200813162927944.png)
+**min_trx_id:**  m_ids数组中最小值
+
+**==max_trx_id==**  下一次readview生成时的事务id
+
+
+
+![image-20200813162927944](image/Mysql索引/image-20200813162927944.png)
 
 ![image-20200813162945375](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200813162945375.png)
 
 ### 数据库锁
 
+**共享锁 （ 读锁）**
+
+一行数据可以有多个s锁
+
+**排它锁（写锁）**
+
+一行数据只能有一个X锁
+
+ **意向排他锁、意向共享锁**
+
+在对一行数据加X或S锁时，需要先对整个表加上IX或IS锁
+
+**InnoDB中的行锁通过对索引加锁**  ，因为通过索引可以找到具体的一条记录
+
 **行锁的实现需要注意：**
 
-1. 行锁必须有索引才能实现，否则会自动锁全表，那么就不是行锁了。
+1. ==行锁必须有索引才能实现==，否则会自动锁全表，那么就不是行锁了。
 2. 两个事务不能锁同一个索引。
 3. insert，delete，update在事务中都会自动默认加上排它锁。
 
@@ -268,7 +300,7 @@ https://www.processon.com/view/link/5eef4a2d6376891e81dc7d28
 
 ### 水平切分
 
- ![image-20200726135615490](C:\Users\87634\AppData\Roaming\Typora\typora-user-images\image-20200726135615490.png)
+ ![image-20200726135615490](image/Mysql索引/image-20200726135615490.png)
 
 
 
@@ -278,15 +310,15 @@ https://www.processon.com/view/link/5eef4a2d6376891e81dc7d28
 
 ## mysql日志
 
-undo log
+undo log：实现事务的原子性
 
-redo log
+redo log： 实现事物的持久性
 
 query log 
 
 slow querylog
 
-bin log
+bin log： 主从复制时，主机将自己的bin log发送给从机进行复制
 
 error log
 
