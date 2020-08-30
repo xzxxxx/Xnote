@@ -118,6 +118,23 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
 
 
 
+## 反射
+
+获取内存中的Class对象，动态的获得一个类的信息，通过获取的信息创建对象
+
+### 	获取Class对象的方式
+
+```java
+	Class<Student> c1 = Student.class //通过类的class属性来获取该类的Class对象
+ 	
+    Student s1 = new Student();
+	Class<? extends Student> c2 = s1.getClass() //调用对象的getClass方法
+        
+    Class<?> c3 = Class.forName(类的全限定类名) //Class中的forName方法
+```
+
+
+
 ## final关键字和finally 与finalize()
 
 **final** 修饰类时，表示该类无法被继承。   修饰字段时，表示该字段是常量，无法被更改。      修饰方法时，表示该方法不能被重载
