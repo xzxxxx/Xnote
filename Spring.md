@@ -42,6 +42,8 @@ advice：before、afterReturning、afterThrowing、after
 
 使用@Autowired时默认byType注入，如果一个type有多个实现类，则需要指定beanName并配合@Qualifier指定要装配的bean
 
+使用@Primary，则表示优先注入某个类
+
 标注在成员变量上，表示使用setter注入
 
 标注在构造方法上，表示使用构造方法注入
