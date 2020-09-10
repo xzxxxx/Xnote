@@ -1,3 +1,5 @@
+https://mp.weixin.qq.com/s?__biz=MzIyNDU2ODA4OQ==&mid=2247484524&idx=1&sn=7ae13d7805f70592245464a7d9512e57&chksm=e80db21adf7a3b0c6b7c8e1367f4c9e772666e1e764a00ad2f4771c87520fdeff68da57f5f07&scene=21#wechat_redirect
+
 ## Redis 能解决什么问题
 
 1、缓存，减少了跟数据库的交互，变化频率不高的数据+访问频率高的数据适合缓存
@@ -16,7 +18,7 @@
 
 ### Redis中的数据类型
 
- 所有的key 都是String , value的类型有 String，list，set，zset，map
+ 所有的key 都是String , value的类型有 String，list，set，zset，hash
 
 
 
