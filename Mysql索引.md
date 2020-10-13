@@ -20,7 +20,7 @@ https://mp.weixin.qq.com/s?__biz=MzIyNDU2ODA4OQ==&mid=2247484733&idx=1&sn=041d3f
 4. 限制索引的数目
 5. 尽量使用前缀来索引
 6. 最左前缀原则
-7. =和in可以乱序  where a= 1 and b = 2 与 where b = 2 and a = 1 是一样的效果只要满足最左前缀原则
+7. ===和in可以乱序==  where a= 1 and b = 2 与 where b = 2 and a = 1 是一样的效果只要满足最左前缀原则
 8. 索引列不参与计算
 
 ###  索引失效

@@ -60,6 +60,20 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
 
 
 
+
+
+## wait() 与 sleep（）
+
+wait()是Object类中的成员方法， sleep() 是Thread类中的静态方法
+
+调用wait() 和sleep() 都会使线程进入Waiting 或 Time Waiting状态
+
+wait() 会释放锁资源，而sleep()不会释放锁资源
+
+wait() 必须配合 synchronized 使用
+
+
+
 ## 序列化与反序列化
 
 实现Serializabel接口即可序列化,并需要指定一个序列化id
@@ -107,12 +121,25 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
 
 
 
+### 创建线程的方式
+
+1. 继承Thread类
+2. 实现Runnable接口
+3. 实现Callable接口
+4. 使用线程池
+
+
+
+
+
+
+
 ## 创建一个类的实例
 
 ```java
  Object o = new object();
  Object o1 = o.clone();
- Object o2 = Class.forname("xxx").newInstance();
+ Object o2 = Class.forname("xxx").newInstance(); //JDK9之后不再使用
  Constructor.newInstance();
 ```
 
@@ -120,7 +147,11 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
 
 ## 反射
 
-获取内存中的Class对象，动态的获得一个类的信息，通过获取的信息创建对象
+获取内存中的Class对象，动态的获得一个类的信息，通过获取的信息创建对象，或调用类的方法
+
+反射可以绕过泛型检查，可以访问类的私有属性
+
+
 
 ### 	获取Class对象的方式
 
@@ -132,6 +163,22 @@ hashmap在put时先判断对象的hash值是否相同，若相同则在调用equ
         
     Class<?> c3 = Class.forName(类的全限定类名) //Class中的forName方法
 ```
+
+
+
+直接new一个对象的速度比反射获得对象的速度快约10倍；
+
+**反射为什么慢：**
+
+1. Class.forName，==调用本地方法==，**耗时** ，使用本地方法要从java -> c -> java
+2. Class.getMethod，遍历该类的共有方法，匹配不到，遍历父类共有方法， **耗时**，getMethod会返回得到结果的拷贝，应避免getMethods和getDeclardMethods方法，减少不必要堆空间消耗。
+3. Method.invoke
+
+
+
+**提高反射效率：**
+
+将获得到的Class、Constructor、Mehtod、Field对象缓存起来
 
 
 
